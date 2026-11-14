@@ -1,14 +1,23 @@
 # Restore an archive made by claude-export.ps1 or claude-export.sh on a Windows machine.
 # Usage (PowerShell):
-#   powershell -ExecutionPolicy Bypass -File .\claude-import.ps1 .\claude-backup-XXXX.tar.gz
-param([Parameter(Mandatory = $true)][string]$Archive)
+#   powershell -ExecutionPolicy Bypass -File .\claude-import.ps1 [path-to-archive]
+# With no path, the newest claude-backup-* file in the current folder is used.
+param([string]$Archive)
 $ErrorActionPreference = 'Stop'
 
 function Write-Utf8([string]$Path, [string]$Text) {
   [IO.File]::WriteAllText($Path, $Text, (New-Object Text.UTF8Encoding $false))
 }
 
-$Archive = (Resolve-Path $Archive).Path
+if (-not $Archive) {
+  $found = Get-ChildItem -Path . -File -Filter 'claude-backup-*' |
+           Where-Object { $_.Name -like '*.tar.gz' -or $_.Name -like '*.zip' } |
+           Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  if (-not $found) { throw "No claude-backup-*.tar.gz or .zip in $((Get-Location).Path). Pass the file path." }
+  $Archive = $found.FullName
+}
+$Archive = @(Resolve-Path $Archive)[0].Path
+Write-Host "Using archive: $Archive"
 $Dst = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $env:USERPROFILE '.claude' }
 $Stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $Stage = Join-Path ([IO.Path]::GetTempPath()) ("claude-import-" + [guid]::NewGuid())
