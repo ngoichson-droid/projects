@@ -5,7 +5,10 @@ set -euo pipefail
 ARCHIVE="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 DST="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 STAGE="$(mktemp -d)"; trap 'rm -rf "$STAGE"' EXIT
-tar -xzf "$ARCHIVE" -C "$STAGE"
+case "$ARCHIVE" in
+  *.zip) unzip -q "$ARCHIVE" -d "$STAGE" ;;
+  *)     tar -xzf "$ARCHIVE" -C "$STAGE" ;;
+esac
 
 # Back up what is there now
 if [ -d "$DST" ]; then

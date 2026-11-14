@@ -28,3 +28,10 @@ bash scripts/claude-import.sh claude-backup-*.tar.gz   # on the other machine
 ```
 The archive holds skills, commands, agents, settings, CLAUDE.md, auto memory and MCP servers.
 It leaves out login credentials, chat history and caches. Keep it private: settings and MCP config can contain keys.
+
+### Windows (PowerShell 5.1+)
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\claude-export.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\claude-import.ps1 .\claude-backup-XXXX.tar.gz
+```
+Archives are interchangeable: one made on macOS/Linux restores on Windows and the other way round.
