@@ -20,3 +20,11 @@ bash scripts/sync-claude-to-repo.sh
 # review, remove secrets, then commit and push
 ```
 Secrets (API keys, tokens) go in the cloud environment's environment variables, not in git.
+
+## Or: one archive, copied by hand
+```bash
+bash scripts/claude-export.sh                 # on the main machine -> claude-backup-*.tar.gz
+bash scripts/claude-import.sh claude-backup-*.tar.gz   # on the other machine
+```
+The archive holds skills, commands, agents, settings, CLAUDE.md, auto memory and MCP servers.
+It leaves out login credentials, chat history and caches. Keep it private: settings and MCP config can contain keys.
